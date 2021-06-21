@@ -1,0 +1,51 @@
+body {
+  background-color: #03243c;
+  color: #fff;
+}
+
+h1 {
+  text-align: center;
+}
+
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.Add-row__btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: #ae38f3;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 100;
+  box-shadow: 0 0 35px #ae38f3;
+  cursor: pointer;
+}
+
+.Add-row__btn:hover {
+  background-color: darken(#ae38f3, 10);
+}
+
+.table__row {
+  border-bottom: 1px solid #fff;
+}
+
+.table__header {
+  display: flex;
+  padding: 15px;
+  list-style-type: none;
+}
+
+.table__header li {
+  margin-right: 15%;
+  white-space: nowrap;
+}
+
+#sort {
+  margin: 0 10px;
+  cursor: pointer;
+}
