@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './diary_row.scss';
 
-class Row extends React.PureComponent {
+class Row extends Component {
   constructor(props) {
     super(props);
     this.state = props;
@@ -20,9 +20,10 @@ class Row extends React.PureComponent {
   }
 
   render() {
+    console.log(this.state);
     const { name } = this.state;
     const { teacher } = this.state;
-
+    const { onDel } = this.state;
     return (
       <ul className="table__row table__header">
         <li>
@@ -35,7 +36,7 @@ class Row extends React.PureComponent {
           {this.calcMark()}
         </li>
         <li>
-          <FontAwesomeIcon id="sort" icon={faTrashAlt} />
+          <FontAwesomeIcon id="sort" onClick={onDel} icon={faTrashAlt} />
         </li>
         <li>
           <FontAwesomeIcon id="sort" icon={faEdit} />

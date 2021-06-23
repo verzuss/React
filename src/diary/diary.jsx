@@ -7,31 +7,40 @@ import './diary.scss';
 class Diary extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      lessons: JSON.parse(localStorage.getItem('lessons')),
-    };
+    if (localStorage.getItem('lessons')) {
+      this.state = {
+        lessons: JSON.parse(localStorage.getItem('lessons')),
+      };
+    } else {
+      this.state = props;
+    }
     this.addLesson = this.addLesson.bind(this);
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   console.log(nextProps, nextState);
-  //   return true;
-  // }
-
   addLesson = () => {
-    if (document.querySelector('#lesson').value.trim()) {
+    const inputValueLessons = document.querySelector('#lesson').value;
+    const inputValueTeacher = document.querySelector('#teacher').value;
+    if (inputValueLessons.trim() && inputValueTeacher.trim()) {
       const { lessons } = this.state;
       const lesson = {};
-      lesson.name = document.querySelector('#lesson').value;
-      lesson.teacher = document.querySelector('#teacher').value;
+      lesson.name = inputValueLessons;
+      lesson.teacher = inputValueTeacher;
       lessons.push(lesson);
-      console.log(lesson);
-      console.log(lessons);
       this.setState({
         lessons,
       });
       localStorage.setItem('lessons', JSON.stringify(lessons));
     }
+  }
+
+  deleteLesson = (index) => {
+    const { lessons } = this.state;
+    lessons.splice(index, 1);
+    this.setState({
+      lessons,
+    });
+    console.log(lessons);
+    localStorage.setItem('lessons', JSON.stringify(lessons));
   }
 
   render() {
@@ -58,11 +67,13 @@ class Diary extends Component {
               <FontAwesomeIcon id="sort" icon={faSortAmountDown} />
             </li>
           </ul>
-          {lessons.map((lesson) => (
+          {lessons.map((lesson, index) => (
             <Row
+              id={index}
               name={lesson.name}
               teacher={lesson.teacher}
               marks={lesson.marks}
+              onDel={() => this.deleteLesson(index)}
             />
           ))}
         </div>
