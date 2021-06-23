@@ -22,12 +22,14 @@ h1 {
   color: #fff;
   font-size: 25px;
   font-weight: 100;
-  box-shadow: 0 0 35px #ae38f3;
+  box-shadow: 0 0 20px #ae38f3;
   cursor: pointer;
+  transition: box-shadow 0.1s linear;
 }
 
 .Add-row__btn:hover {
   background-color: darken(#ae38f3, 10);
+  box-shadow: 0 0 35px #ae38f3;
 }
 
 .table__row {
@@ -41,7 +43,7 @@ h1 {
 }
 
 .table__header li {
-  margin-right: 15%;
+  width: 20%;
   white-space: nowrap;
 }
 
