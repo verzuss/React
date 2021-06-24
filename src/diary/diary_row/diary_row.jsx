@@ -1,16 +1,12 @@
+/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './diary_row.scss';
 
 class Row extends Component {
-  constructor(props) {
-    super(props);
-    this.state = props;
-  }
-
   calcMark = () => {
-    const { marks } = this.state;
+    const { marks } = this.props;
     const averageMark = marks
       ? marks
         .map((mark) => mark.mark)
@@ -20,26 +16,25 @@ class Row extends Component {
   }
 
   render() {
-    console.log(this.state);
-    const { name } = this.state;
-    const { teacher } = this.state;
-    const { onDel } = this.state;
+    const {
+      name, teacher, onDel, editLesson,
+    } = this.props;
     return (
-      <ul className="table__row table__header">
+      <ul className="table__row">
         <li>
           {name}
         </li>
         <li>
           {teacher}
         </li>
-        <li>
+        <li className="column__mark">
           {this.calcMark()}
         </li>
-        <li>
+        <li className="column__icon">
           <FontAwesomeIcon id="sort" onClick={onDel} icon={faTrashAlt} />
         </li>
-        <li>
-          <FontAwesomeIcon id="sort" icon={faEdit} />
+        <li className="column__icon">
+          <FontAwesomeIcon id="sort" onClick={editLesson} icon={faEdit} />
         </li>
       </ul>
     );

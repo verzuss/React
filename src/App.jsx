@@ -1,76 +1,20 @@
 import './App.scss';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Diary from './diary/diary';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      lessons: [
-        // {
-        //   name: 'English',
-        //   teacher: 'Ivanov Ivan',
-        //   marks: [
-        //     {
-        //       date: Date(),
-        //       mark: 5,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 5,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 5,
-        //     },
-        //   ],
-        // },
-        // {
-        //   name: 'Math',
-        //   teacher: 'Olegov Oleg',
-        //   marks: [
-        //     {
-        //       date: Date(),
-        //       mark: 4,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 3,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 3,
-        //     },
-        //   ],
-        // },
-        // {
-        //   name: 'History',
-        //   teacher: 'Danilov Daniil',
-        //   marks: [
-        //     {
-        //       date: Date(),
-        //       mark: 5,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 5,
-        //     },
-        //     {
-        //       date: Date(),
-        //       mark: 4,
-        //     },
-        //   ],
-        // },
-      ],
-    };
-  }
-
+class App extends PureComponent {
   render() {
-    const { lessons } = this.state;
-
     return (
       <>
-        <Diary lessons={lessons} />
+        <Router>
+          <div>
+            <Route exact path="/">
+              <Diary />
+            </Route>
+          </div>
+        </Router>
       </>
     );
   }

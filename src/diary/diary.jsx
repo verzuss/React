@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Row from './diary_row/diary_row';
+import Modal from './modal/modal';
 import './diary.scss';
 
 class Diary extends Component {
@@ -10,9 +11,17 @@ class Diary extends Component {
     if (localStorage.getItem('lessons')) {
       this.state = {
         lessons: JSON.parse(localStorage.getItem('lessons')),
+        isOpen: false,
+        isEdit: false,
+        editIndex: null,
       };
     } else {
-      this.state = props;
+      this.state = {
+        lessons: [],
+        isOpen: false,
+        isEdit: false,
+        editIndex: null,
+      };
     }
     this.addLesson = this.addLesson.bind(this);
   }
@@ -22,12 +31,55 @@ class Diary extends Component {
     const inputValueTeacher = document.querySelector('#teacher').value;
     if (inputValueLessons.trim() && inputValueTeacher.trim()) {
       const { lessons } = this.state;
+      const { isOpen } = this.state;
       const lesson = {};
       lesson.name = inputValueLessons;
       lesson.teacher = inputValueTeacher;
       lessons.push(lesson);
       this.setState({
         lessons,
+        isOpen: !isOpen,
+      });
+      localStorage.setItem('lessons', JSON.stringify(lessons));
+    }
+  }
+
+  toggleModal = () => {
+    const { isOpen } = this.state;
+    this.setState({
+      isOpen: !isOpen,
+    });
+  }
+
+  closeModal = () => {
+    this.setState({
+      isOpen: false,
+      isEdit: false,
+    });
+  }
+
+  toggleEditModal = (index) => {
+    const { isEdit } = this.state;
+    const { isOpen } = this.state;
+    this.setState({
+      editIndex: index,
+      isOpen: !isOpen,
+      isEdit: !isEdit,
+    });
+  }
+
+  editLesson = (index) => {
+    const inputValueLessons = document.querySelector('#lesson').value;
+    const inputValueTeacher = document.querySelector('#teacher').value;
+    if (inputValueLessons.trim() && inputValueTeacher.trim()) {
+      const { isOpen, isEdit, lessons } = this.state;
+      lessons[index].name = inputValueLessons;
+      lessons[index].teacher = inputValueTeacher;
+      this.setState({
+        lessons,
+        isOpen: !isOpen,
+        editIndex: null,
+        isEdit: !isEdit,
       });
       localStorage.setItem('lessons', JSON.stringify(lessons));
     }
@@ -39,43 +91,90 @@ class Diary extends Component {
     this.setState({
       lessons,
     });
-    console.log(lessons);
     localStorage.setItem('lessons', JSON.stringify(lessons));
+  }
+
+  onKeyPressHandler = (event) => {
+    const { isEdit, editIndex } = this.state;
+    if (event.code === 'Enter') {
+      if (isEdit) {
+        this.editLesson(editIndex);
+      } else this.addLesson();
+    }
   }
 
   render() {
     let { lessons } = this.state;
+    const { isOpen, isEdit, editIndex } = this.state;
     if (localStorage.getItem('lessons')) {
       lessons = JSON.parse(localStorage.getItem('lessons'));
     }
+    const lessonsRow = lessons.map((lesson, key) => (
+      <Row
+        name={lesson.name}
+        teacher={lesson.teacher}
+        marks={lesson.marks}
+        onDel={() => this.deleteLesson(key)}
+        editLesson={() => this.toggleEditModal(key)}
+      />
+    ));
+
+    // let lessonsModal;
+
+    // if (isOpen) {
+    //   if (isEdit) {
+    //     lessonsModal = (
+    //       <Modal
+    //         lessons={lessons[editIndex]}
+    //         toggleModal={this.toggleModal}
+    //         addLesson={this.addLesson}
+    //         onEnter={this.onKeyPressHandler}
+    //         isEdit
+    //       />
+    //     );
+    //   } else {
+    //     lessonsModal = (
+    //       <Modal
+    //         toggleModal={this.toggleModal}
+    //         addLesson={this.addLesson}
+    //         onEnter={this.onKeyPressHandler}
+    //       />
+    //     );
+    //   }
+    // }
+    console.log(isEdit, editIndex);
+    const lessonsModal = isOpen
+      ? (
+        <Modal
+          lessons={lessons}
+          toggleModal={this.toggleModal}
+          addLesson={this.addLesson}
+          editLesson={() => this.editLesson(editIndex)}
+          closeModal={this.closeModal}
+          onEnter={this.onKeyPressHandler}
+          isEdit={isEdit}
+          index={editIndex}
+        />
+      )
+      : null;
     return (
       <div className="container">
         <h1 className="header">Hello</h1>
-        <button type="button" className="Add-row__btn">+</button>
-        <input id="lesson" type="text" placeholder="lesson" />
-        <input id="teacher" type="text" placeholder="teacher" />
-        <button onClick={this.addLesson} type="button"> add</button>
+        <button type="button" onClick={this.toggleModal} className="Add-row__btn">+</button>
         <div className="table">
           <ul className="table__row table__header">
             <li>
-              Name
+              Subject
               <FontAwesomeIcon id="sort" icon={faSortAlphaDown} />
             </li>
             <li>Teacher</li>
-            <li>
+            <li className="column__mark">
               Mark
               <FontAwesomeIcon id="sort" icon={faSortAmountDown} />
             </li>
           </ul>
-          {lessons.map((lesson, index) => (
-            <Row
-              id={index}
-              name={lesson.name}
-              teacher={lesson.teacher}
-              marks={lesson.marks}
-              onDel={() => this.deleteLesson(index)}
-            />
-          ))}
+          { lessonsRow }
+          { lessonsModal }
         </div>
       </div>
     );
