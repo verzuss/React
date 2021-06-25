@@ -15,6 +15,7 @@ h1 {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 15px;
+  position: relative;
 }
 
 .Add-row__btn {
@@ -60,10 +61,6 @@ svg:hover {
 
 .table__header {
   white-space: nowrap;
-}
-
-.table__row:hover {
-  background-color: lighten(#03243c, 10);
 }
 
 .table__header:hover {

@@ -1,8 +1,8 @@
 import './App.scss';
 import React, { PureComponent } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Diary from './diary/diary';
+import Marks from './diary/marks/marks';
 
 class App extends PureComponent {
   render() {
@@ -12,6 +12,9 @@ class App extends PureComponent {
           <div>
             <Route exact path="/">
               <Diary />
+            </Route>
+            <Route path="/marks/:index">
+              <Marks />
             </Route>
           </div>
         </Router>

@@ -1,13 +1,13 @@
-/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
-import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { withRouter } from 'react-router';
+import { faTrashAlt, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './diary_row.scss';
 
 class Row extends Component {
   calcMark = () => {
     const { marks } = this.props;
-    const averageMark = marks
+    const averageMark = marks.length
       ? marks
         .map((mark) => mark.mark)
         .reduce((accumulator, current) => +accumulator + +current, 0) / marks.length
@@ -17,7 +17,7 @@ class Row extends Component {
 
   render() {
     const {
-      name, teacher, onDel, editLesson,
+      name, teacher, onDel, editLesson, index, history,
     } = this.props;
     return (
       <ul className="table__row">
@@ -29,6 +29,7 @@ class Row extends Component {
         </li>
         <li className="column__mark">
           {this.calcMark()}
+          <FontAwesomeIcon id="sort" onClick={() => history.push(`/marks/${index}`)} icon={faPlus} />
         </li>
         <li className="column__icon">
           <FontAwesomeIcon id="sort" onClick={onDel} icon={faTrashAlt} />
@@ -41,4 +42,4 @@ class Row extends Component {
   }
 }
 
-export default Row;
+export default withRouter(Row);

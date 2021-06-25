@@ -1,0 +1,29 @@
+.marks-modal__mark {
+    display: inline-block;
+    background-color: inherit;
+    color: #fff;
+    border: none;
+    border-bottom: 1px solid #fff;
+    font-size: 16px;
+    margin-left: 10px;
+    width: 40px;
+}
+
+.marks-modal {
+    text-align: left;
+    width: 250px;
+}
+
+input.marks-modal__date {
+    display: inline-block;
+    margin-left: 10px;
+    width: auto;
+}
+
+.marks-modal__mark option {
+    background-color: #000;
+}
+
+.marks-modal__date::-webkit-calendar-picker-indicator { 
+    display: none;
+}

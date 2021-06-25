@@ -35,6 +35,7 @@ class Diary extends Component {
       const lesson = {};
       lesson.name = inputValueLessons;
       lesson.teacher = inputValueTeacher;
+      lesson.marks = [];
       lessons.push(lesson);
       this.setState({
         lessons,
@@ -114,35 +115,12 @@ class Diary extends Component {
         name={lesson.name}
         teacher={lesson.teacher}
         marks={lesson.marks}
+        index={key}
         onDel={() => this.deleteLesson(key)}
         editLesson={() => this.toggleEditModal(key)}
       />
     ));
 
-    // let lessonsModal;
-
-    // if (isOpen) {
-    //   if (isEdit) {
-    //     lessonsModal = (
-    //       <Modal
-    //         lessons={lessons[editIndex]}
-    //         toggleModal={this.toggleModal}
-    //         addLesson={this.addLesson}
-    //         onEnter={this.onKeyPressHandler}
-    //         isEdit
-    //       />
-    //     );
-    //   } else {
-    //     lessonsModal = (
-    //       <Modal
-    //         toggleModal={this.toggleModal}
-    //         addLesson={this.addLesson}
-    //         onEnter={this.onKeyPressHandler}
-    //       />
-    //     );
-    //   }
-    // }
-    console.log(isEdit, editIndex);
     const lessonsModal = isOpen
       ? (
         <Modal

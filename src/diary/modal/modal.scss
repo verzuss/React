@@ -3,10 +3,10 @@
     left: 30%;
     top: 40%;
     width: 40%;
-    height: 20%;
+    height: 150px;
     border: 1px solid #fff;
     padding: 20px;
-    padding-top: 5%;
+    padding-top: 40px;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -23,6 +23,10 @@
     outline: none;
     font-size: 15px;
     color: #fff;
+}
+
+.modal input:invalid {
+    border-bottom: 2px solid rgb(102, 0, 0);
 }
 
 .modal input:focus{
@@ -44,7 +48,6 @@
 
 .modal button:hover {
     background-color: darken(#ae38f3, 10);
-    box-shadow: 0 0 35px #ae38f3;
   }
 
 .modal svg {
