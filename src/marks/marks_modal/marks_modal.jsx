@@ -5,6 +5,9 @@ import { PropTypes } from 'prop-types';
 import './marks_modal.scss';
 
 class MarksModal extends React.PureComponent {
+  formattedDate = (d = new Date()) => [d.getFullYear(), d.getMonth(), d.getDate()]
+    .map((n) => (n < 10 ? `0${n}` : `${n}`)).join('-')
+
   render() {
     const {
       lessons,
@@ -16,6 +19,7 @@ class MarksModal extends React.PureComponent {
       closeModal,
       editMark,
     } = this.props;
+    const today = this.formattedDate();
     const markValue = lessons[indexLesson].marks[indexMark];
     if (!isEdit) {
       return (
@@ -27,7 +31,9 @@ class MarksModal extends React.PureComponent {
               date
               <input
                 onKeyPress={onEnter}
-                defaultValue="2021-06-25"
+                defaultValue={today}
+                min="2000-01-01"
+                max="2021-12-31"
                 className="marks-modal__date"
                 required
                 id="date"
@@ -61,6 +67,8 @@ class MarksModal extends React.PureComponent {
             <input
               onKeyPress={onEnter}
               defaultValue={markValue.date}
+              min="2000-01-01"
+              max="2021-12-31"
               className="marks-modal__date"
               required
               id="date"

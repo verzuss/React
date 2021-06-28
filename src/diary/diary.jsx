@@ -234,7 +234,7 @@ class Diary extends Component {
 
     return (
       <div className="container">
-        <h1 className="header">Hello</h1>
+        <h1 className="header">Diary</h1>
         <button
           type="button"
           onClick={this.toggleModal}
