@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { PropTypes } from 'prop-types';
 import MarksRow from './marks_row/marks_row';
 import MarksModal from './marks_modal/marks_modal';
 import './marks.scss';
@@ -9,13 +10,14 @@ import './marks.scss';
 class Marks extends Component {
   constructor(props) {
     super(props);
+    const { match } = this.props;
     if (localStorage.getItem('lessons')) {
       this.state = {
         lessons: JSON.parse(localStorage.getItem('lessons')),
         isOpen: false,
         isEdit: false,
         editIndex: null,
-        index: this.props.match.params.index,
+        index: match.params.index,
       };
     }
   }
@@ -33,7 +35,6 @@ class Marks extends Component {
         lessons,
         isOpen: !isOpen,
       });
-      localStorage.setItem('lessons', JSON.stringify(lessons));
     }
   }
 
@@ -61,7 +62,6 @@ class Marks extends Component {
         editIndex: null,
         isEdit: !isEdit,
       });
-      localStorage.setItem('lessons', JSON.stringify(lessons));
     }
   }
 
@@ -71,7 +71,6 @@ class Marks extends Component {
     this.setState({
       lessons,
     });
-    localStorage.setItem('lessons', JSON.stringify(lessons));
   }
 
   closeModal = () => {
@@ -99,8 +98,10 @@ class Marks extends Component {
 
   render() {
     const {
-      lessons, index, isOpen, isEdit, editIndex, history,
+      lessons, index, isOpen, isEdit, editIndex,
     } = this.state;
+    const { history } = this.props;
+    localStorage.setItem('lessons', JSON.stringify(lessons));
     const marksRow = lessons[index].marks.map((item, key) => (
       <MarksRow
         mark={item.mark}
@@ -143,5 +144,11 @@ class Marks extends Component {
     );
   }
 }
+
+Marks.propTypes = {
+  match: PropTypes.instanceOf(Object).isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
+  index: PropTypes.number.isRequired,
+};
 
 export default withRouter(Marks);

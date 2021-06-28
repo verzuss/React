@@ -2,7 +2,7 @@ import './App.scss';
 import React, { PureComponent } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Diary from './diary/diary';
-import Marks from './diary/marks/marks';
+import Marks from './marks/marks';
 
 class App extends PureComponent {
   render() {
