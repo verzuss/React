@@ -5,16 +5,45 @@ import { PropTypes } from 'prop-types';
 import './modal.scss';
 
 class Modal extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    const { isEdit, lessons, index } = this.props;
+    this.state = {
+      valueTeacherInput: isEdit ? lessons[index].teacher : '',
+      valueLessonInput: isEdit ? lessons[index].name : '',
+    };
+  }
+
+  handleLessonInput = (value) => {
+    this.setState({
+      valueLessonInput: value,
+    });
+  }
+
+  handleTeacherInput = (value) => {
+    this.setState({
+      valueTeacherInput: value,
+    });
+  }
+
+  onEnterHandler = (event) => {
+    const { valueLessonInput, valueTeacherInput } = this.state;
+    const { isEdit, editLesson, addLesson } = this.props;
+    if (event.code === 'Enter') {
+      if (isEdit) {
+        editLesson(valueLessonInput, valueTeacherInput);
+      } else addLesson(valueLessonInput, valueTeacherInput);
+    }
+  };
+
   render() {
     const {
-      lessons,
-      index,
       addLesson,
-      onEnter,
       isEdit,
       closeModal,
       editLesson,
     } = this.props;
+    const { valueLessonInput, valueTeacherInput } = this.state;
     if (!isEdit) {
       return (
         <>
@@ -22,20 +51,22 @@ class Modal extends React.PureComponent {
           <div className="modal">
             <FontAwesomeIcon id="icon" onClick={closeModal} icon={faTimes} />
             <input
-              onKeyPress={onEnter}
+              onKeyPress={this.onEnterHandler}
+              onChange={(e) => this.handleLessonInput(e.target.value)}
               required
               id="lesson"
               type="text"
               placeholder="lesson"
             />
             <input
-              onKeyPress={onEnter}
+              onKeyPress={this.onEnterHandler}
+              onChange={(e) => this.handleTeacherInput(e.target.value)}
               required
               id="teacher"
               type="text"
               placeholder="teacher"
             />
-            <button onClick={addLesson} type="button">
+            <button onClick={() => addLesson(valueLessonInput, valueTeacherInput)} type="button">
               add
             </button>
           </div>
@@ -48,22 +79,24 @@ class Modal extends React.PureComponent {
         <div className="modal">
           <FontAwesomeIcon id="icon" onClick={closeModal} icon={faTimes} />
           <input
-            onKeyPress={onEnter}
+            onKeyPress={this.onEnterHandler}
+            onChange={(e) => this.handleLessonInput(e.target.value)}
             required
-            defaultValue={lessons[index].name}
+            value={valueLessonInput}
             id="lesson"
             type="text"
             placeholder="lesson"
           />
           <input
-            onKeyPress={onEnter}
+            onKeyPress={this.onEnterHandler}
+            onChange={(e) => this.handleTeacherInput(e.target.value)}
             required
-            defaultValue={lessons[index].teacher}
+            value={valueTeacherInput}
             id="teacher"
             type="text"
             placeholder="teacher"
           />
-          <button onClick={editLesson} type="button">
+          <button onClick={() => editLesson(valueLessonInput, valueTeacherInput)} type="button">
             Edit
           </button>
         </div>
@@ -74,11 +107,8 @@ class Modal extends React.PureComponent {
 
 Modal.propTypes = {
   lessons: PropTypes.instanceOf(Array).isRequired,
-  name: PropTypes.string.isRequired,
-  teacher: PropTypes.string.isRequired,
   addLesson: PropTypes.func.isRequired,
   editLesson: PropTypes.func.isRequired,
-  onEnter: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
   isEdit: PropTypes.bool.isRequired,

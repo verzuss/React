@@ -3,7 +3,6 @@ import { withRouter } from 'react-router';
 import { faTrashAlt, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import './diary_row.scss';
 
 class Row extends React.PureComponent {
   render() {
@@ -18,6 +17,7 @@ class Row extends React.PureComponent {
           {averageMark}
           <FontAwesomeIcon
             id="icon"
+            className="column__add-marks"
             onClick={() => history.push(`/marks/${index}`)}
             icon={faPlus}
           />

@@ -5,20 +5,50 @@ import { PropTypes } from 'prop-types';
 import './marks_modal.scss';
 
 class MarksModal extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isInputValue: false,
+    };
+  }
+
+  onKeyPressHandler = (event) => {
+    if (event.code === 'Enter') {
+      this.checkInput();
+    }
+  };
+
   formattedDate = (d = new Date()) => [d.getFullYear(), d.getMonth(), d.getDate()]
     .map((n) => (n < 10 ? `0${n}` : `${n}`)).join('-')
+
+  checkInput = () => {
+    const {
+      addMark, editMark, isEdit,
+    } = this.props;
+    const dateInputValue = document.querySelector('.marks-modal__date').value;
+    if (dateInputValue > this.formattedDate() || dateInputValue < '2000-01-01') {
+      this.setState({
+        isInputValue: true,
+      });
+    } else if (isEdit) {
+      editMark();
+    } else {
+      addMark();
+    }
+  }
 
   render() {
     const {
       lessons,
       indexMark,
       indexLesson,
-      addMark,
-      onEnter,
       isEdit,
       closeModal,
-      editMark,
+      getDateInput,
+      getMarkInput,
     } = this.props;
+    const { isInputValue } = this.state;
+    const errorSpan = isInputValue ? <span className="marks-modal__err-text">Permissible value: 2000 - current date</span> : null;
     const today = this.formattedDate();
     const markValue = lessons[indexLesson].marks[indexMark];
     if (!isEdit) {
@@ -30,19 +60,21 @@ class MarksModal extends React.PureComponent {
             <div>
               date
               <input
-                onKeyPress={onEnter}
+                onKeyDown={this.onKeyPressHandler}
                 defaultValue={today}
                 min="2000-01-01"
-                max="2021-12-31"
+                max={today}
                 className="marks-modal__date"
                 required
                 id="date"
                 type="date"
+                ref={getDateInput}
               />
             </div>
+            {errorSpan}
             <div>
               mark
-              <select className="marks-modal__mark">
+              <select ref={getMarkInput} className="marks-modal__mark">
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
@@ -50,7 +82,7 @@ class MarksModal extends React.PureComponent {
                 <option>5</option>
               </select>
             </div>
-            <button onClick={addMark} type="button">
+            <button onClick={this.checkInput} type="button">
               add
             </button>
           </div>
@@ -65,19 +97,24 @@ class MarksModal extends React.PureComponent {
           <div>
             date
             <input
-              onKeyPress={onEnter}
               defaultValue={markValue.date}
               min="2000-01-01"
-              max="2021-12-31"
+              max={today}
               className="marks-modal__date"
               required
               id="date"
               type="date"
+              ref={getDateInput}
             />
           </div>
+          {errorSpan}
           <div>
             mark
-            <select className="marks-modal__mark" defaultValue={markValue.mark}>
+            <select
+              ref={getMarkInput}
+              className="marks-modal__mark"
+              defaultValue={markValue.mark}
+            >
               <option>1</option>
               <option>2</option>
               <option>3</option>
@@ -85,7 +122,7 @@ class MarksModal extends React.PureComponent {
               <option>5</option>
             </select>
           </div>
-          <button onClick={editMark} type="button">
+          <button onClick={this.checkInput} type="button">
             edit
           </button>
         </div>
@@ -96,13 +133,14 @@ class MarksModal extends React.PureComponent {
 
 MarksModal.propTypes = {
   lessons: PropTypes.instanceOf(Array).isRequired,
-  onEnter: PropTypes.func.isRequired,
   editMark: PropTypes.func.isRequired,
   addMark: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
-  indexLesson: PropTypes.number.isRequired,
+  indexLesson: PropTypes.string.isRequired,
   indexMark: PropTypes.number.isRequired,
   isEdit: PropTypes.bool.isRequired,
+  getMarkInput: PropTypes.instanceOf(Object).isRequired,
+  getDateInput: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default MarksModal;

@@ -88,3 +88,18 @@ li.column__mark {
 .active:hover {
   color: #ae38f3;
 }
+
+.column__add-marks{
+  border-radius: 50%;
+  background-color: #ae38f395;
+}
+
+.column__add-marks:hover {
+  color: #fff;
+  background-color: #ae38f3;
+  
+}
+
+#icon.column__add-marks{
+  padding: 3px;
+}

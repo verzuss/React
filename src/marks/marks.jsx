@@ -10,81 +10,67 @@ import './marks.scss';
 class Marks extends Component {
   constructor(props) {
     super(props);
-    const { match } = this.props;
+    this.dateInput = React.createRef();
+    this.markInput = React.createRef();
     if (localStorage.getItem('lessons')) {
       this.state = {
         lessons: JSON.parse(localStorage.getItem('lessons')),
-        isOpen: false,
-        isEdit: false,
         editIndex: null,
-        index: match.params.index,
       };
     }
   }
 
+  componentDidUpdate() {
+    const { lessons } = this.state;
+    localStorage.setItem('lessons', JSON.stringify(lessons));
+  }
+
   addMark = () => {
-    const inputValueDate = document.querySelector('.marks-modal__date').value;
+    const inputValueDate = this.dateInput.current.value;
     if (inputValueDate.trim()) {
-      const { lessons, index } = this.state;
-      const { isOpen } = this.state;
+      const { lessons } = this.state;
+      const { match, closeModal } = this.props;
       const note = {};
       note.date = inputValueDate;
-      note.mark = document.querySelector('.marks-modal__mark').value;
-      lessons[index].marks.push(note);
+      note.mark = this.markInput.current.value;
+      lessons[match.params.index].marks.push(note);
       this.setState({
         lessons,
-        isOpen: !isOpen,
       });
+      closeModal();
     }
   }
 
-  toggleEditModal = (index) => {
-    const { isEdit } = this.state;
-    const { isOpen } = this.state;
-    this.setState({
-      editIndex: index,
-      isOpen: !isOpen,
-      isEdit: !isEdit,
-    });
-  }
-
   editMark = (editIndex) => {
-    const inputValueDate = document.querySelector('.marks-modal__date').value;
+    const inputValueDate = this.dateInput.current.value;
     if (inputValueDate.trim()) {
-      const {
-        isOpen, isEdit, lessons, index,
-      } = this.state;
-      lessons[index].marks[editIndex].date = inputValueDate;
-      lessons[index].marks[editIndex].mark = document.querySelector('.marks-modal__mark').value;
+      const { lessons } = this.state;
+      const { match, closeModal } = this.props;
+      lessons[match.params.index].marks[editIndex].date = inputValueDate;
+      lessons[match.params.index].marks[editIndex].mark = this.markInput.current.value;
       this.setState({
         lessons,
-        isOpen: !isOpen,
         editIndex: null,
-        isEdit: !isEdit,
       });
+      closeModal();
     }
   }
 
   deleteMark = (indexDel) => {
-    const { lessons, index } = this.state;
-    lessons[index].marks.splice(indexDel, 1);
+    const { lessons } = this.state;
+    const { match } = this.props;
+    lessons[match.params.index].marks.splice(indexDel, 1);
     this.setState({
       lessons,
     });
   }
 
-  closeModal = () => {
+  toggleEditModal = (index) => {
+    const { openEditModal } = this.props;
     this.setState({
-      isOpen: false,
-      isEdit: false,
+      editIndex: index,
     });
-  }
-
-  toggleModal = () => {
-    const { isOpen } = this.state;
-    this.setState({
-      isOpen: !isOpen,
-    });
+    openEditModal();
   }
 
   onKeyPressHandler = (event) => {
@@ -98,17 +84,20 @@ class Marks extends Component {
 
   render() {
     const {
-      lessons, index, isOpen, isEdit, editIndex,
+      lessons, editIndex,
     } = this.state;
-    const { history } = this.props;
-    localStorage.setItem('lessons', JSON.stringify(lessons));
-    const marksRow = lessons[index].marks.map((item, key) => (
+    const {
+      isOpen, isEdit, openModal, closeModal,
+    } = this.props;
+    const { match, history } = this.props;
+    const marksRow = lessons[match.params.index].marks.map((item, key) => (
       <MarksRow
         mark={item.mark}
         date={item.date}
         index={key}
         onDel={() => this.deleteMark(key)}
         editLesson={() => this.toggleEditModal(key)}
+        key={Date.now() * Math.random()}
       />
     ));
 
@@ -117,11 +106,13 @@ class Marks extends Component {
         lessons={lessons}
         addMark={this.addMark}
         editMark={() => this.editMark(editIndex)}
-        closeModal={this.closeModal}
+        closeModal={closeModal}
         onEnter={this.onKeyPressHandler}
         isEdit={isEdit}
-        indexMark={editIndex}
-        indexLesson={index}
+        indexMark={editIndex || 0}
+        indexLesson={match.params.index}
+        getDateInput={this.dateInput}
+        getMarkInput={this.markInput}
       />
     )
       : null;
@@ -131,7 +122,7 @@ class Marks extends Component {
         <button type="button" onClick={() => history.push('/')} className="Add-row__btn marks__home">
           <FontAwesomeIcon id="home" icon={faHome} />
         </button>
-        <button type="button" onClick={this.toggleModal} className="Add-row__btn">+</button>
+        <button type="button" onClick={openModal} className="Add-row__btn">+</button>
         <div className="table">
           <ul className="table__row table__header">
             <li>Date</li>
@@ -148,7 +139,11 @@ class Marks extends Component {
 Marks.propTypes = {
   match: PropTypes.instanceOf(Object).isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
-  index: PropTypes.number.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  openModal: PropTypes.func.isRequired,
+  openEditModal: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  isEdit: PropTypes.bool.isRequired,
 };
 
 export default withRouter(Marks);

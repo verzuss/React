@@ -11,7 +11,7 @@
 
 .marks-modal {
     text-align: left;
-    width: 250px;
+    width: 280px;
 }
 
 input.marks-modal__date {
@@ -26,4 +26,8 @@ input.marks-modal__date {
 
 .marks-modal__date::-webkit-calendar-picker-indicator { 
     display: none;
+}
+
+.marks-modal__err-text {
+    color: rgb(151, 0, 0);
 }

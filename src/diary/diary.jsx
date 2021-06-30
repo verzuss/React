@@ -6,6 +6,7 @@ import {
   faSortAmountDownAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PropTypes from 'prop-types';
 import Row from './diary_row/diary_row';
 import Modal from './modal/modal';
 import './diary.scss';
@@ -13,24 +14,34 @@ import './diary.scss';
 class Diary extends Component {
   constructor(props) {
     super(props);
-    if (localStorage.getItem('lessons')) {
-      this.state = {
-        lessons: JSON.parse(localStorage.getItem('lessons')),
-        isOpen: false,
-        isEdit: false,
-        editIndex: null,
-        sortStatus: null,
-      };
-    } else {
-      this.state = {
-        lessons: [],
-        isOpen: false,
-        isEdit: false,
-        editIndex: null,
-        sortStatus: null,
-      };
-    }
+    const storageData = localStorage.getItem('lessons');
+    this.state = {
+      lessons: storageData ? JSON.parse(storageData) : [],
+      editIndex: null,
+      sortStatus: null,
+    };
     this.addLesson = this.addLesson.bind(this);
+  }
+
+  componentDidMount() {
+    let { lessons } = this.state;
+    lessons = lessons.map((lesson) => ({
+      ...lesson,
+      averageMark: lesson.marks.length
+        ? (lesson.marks
+          .map((note) => note.mark)
+          .reduce((accumulator, current) => +accumulator + +current, 0)
+            / lesson.marks.length).toFixed(2)
+        : '0.00',
+    }));
+    this.setState({
+      lessons,
+    });
+  }
+
+  componentDidUpdate() {
+    const { lessons } = this.state;
+    localStorage.setItem('lessons', JSON.stringify(lessons));
   }
 
   changeSortStatus = (sortType) => {
@@ -39,29 +50,20 @@ class Diary extends Component {
       if (sortStatus !== 'lessonsSort') {
         this.setState({
           sortStatus: 'lessonsSort',
-        }, () => {
-          this.sortArray();
         });
       } else {
         this.setState({
           sortStatus: 'lessonsSortReverse',
-        }, () => {
-          this.sortArray();
         });
       }
-    }
-    if (sortType === 'marksSort') {
+    } else if (sortType === 'marksSort') {
       if (sortStatus !== 'marksSort') {
         this.setState({
           sortStatus: 'marksSort',
-        }, () => {
-          this.sortArray();
         });
       } else {
         this.setState({
           sortStatus: 'marksSortReverse',
-        }, () => {
-          this.sortArray();
         });
       }
     }
@@ -69,90 +71,66 @@ class Diary extends Component {
 
   sortArray = () => {
     const { lessons, sortStatus } = this.state;
-    if (sortStatus === 'lessonsSort') {
-      lessons.sort((a, b) => {
-        if (a.name.toLowerCase() > b.name.toLowerCase()) {
-          return 1;
-        }
-        return -1;
-      });
-    }
-    if (sortStatus === 'lessonsSortReverse') {
-      lessons.sort((a, b) => {
-        if (a.name.toLowerCase() > b.name.toLowerCase()) {
+    switch (sortStatus) {
+      case 'lessonsSort':
+        return lessons.sort((a, b) => {
+          if (a.name.toLowerCase() > b.name.toLowerCase()) {
+            return 1;
+          }
           return -1;
-        }
-        return 1;
-      });
+        });
+
+      case 'lessonsSortReverse':
+        return lessons.sort((a, b) => {
+          if (a.name.toLowerCase() > b.name.toLowerCase()) {
+            return -1;
+          }
+          return 1;
+        });
+
+      case 'marksSort':
+        return lessons.sort((a, b) => b.averageMark - a.averageMark);
+
+      case 'marksSortReverse':
+        return lessons.sort((a, b) => a.averageMark - b.averageMark);
+
+      default:
+        return lessons;
     }
-    if (sortStatus === 'marksSort') {
-      lessons.sort((a, b) => b.averageMark - a.averageMark);
-    }
-    if (sortStatus === 'marksSortReverse') {
-      lessons.sort((a, b) => a.averageMark - b.averageMark);
-    }
-    this.setState({
-      lessons,
-    });
   }
 
-  addLesson = () => {
-    const inputValueLessons = document.querySelector('#lesson').value;
-    const inputValueTeacher = document.querySelector('#teacher').value;
+  addLesson = (inputValueLessons, inputValueTeacher) => {
+    const { lessons } = this.state;
+    const { closeModal } = this.props;
     if (inputValueLessons.trim() && inputValueTeacher.trim()) {
-      const { lessons } = this.state;
-      const { isOpen } = this.state;
-      const lesson = {};
-      lesson.name = inputValueLessons;
-      lesson.teacher = inputValueTeacher;
-      lesson.marks = [];
-      lessons.push(lesson);
       this.setState({
-        lessons,
-        isOpen: !isOpen,
+        lessons: [
+          ...lessons,
+          {
+            name: inputValueLessons,
+            teacher: inputValueTeacher,
+            averageMark: '0.00',
+            marks: [],
+          },
+        ],
         sortStatus: null,
       });
+      closeModal();
     }
   };
 
-  toggleModal = () => {
-    const { isOpen } = this.state;
-    this.setState({
-      isOpen: !isOpen,
-    });
-  };
-
-  closeModal = () => {
-    this.setState({
-      isOpen: false,
-      isEdit: false,
-    });
-  };
-
-  toggleEditModal = (index) => {
-    const { isEdit } = this.state;
-    const { isOpen } = this.state;
-    this.setState({
-      editIndex: index,
-      isOpen: !isOpen,
-      isEdit: !isEdit,
-    });
-  };
-
-  editLesson = (index) => {
-    const inputValueLessons = document.querySelector('#lesson').value;
-    const inputValueTeacher = document.querySelector('#teacher').value;
+  editLesson = (index, inputValueLessons, inputValueTeacher) => {
     if (inputValueLessons.trim() && inputValueTeacher.trim()) {
-      const { isOpen, isEdit, lessons } = this.state;
+      const { lessons } = this.state;
+      const { closeModal } = this.props;
       lessons[index].name = inputValueLessons;
       lessons[index].teacher = inputValueTeacher;
       this.setState({
         lessons,
-        isOpen: !isOpen,
         editIndex: null,
-        isEdit: !isEdit,
         sortStatus: null,
       });
+      closeModal();
     }
   };
 
@@ -162,6 +140,14 @@ class Diary extends Component {
     this.setState({
       lessons,
     });
+  };
+
+  toggleEditModal = (index) => {
+    const { openEditModal } = this.props;
+    this.setState({
+      editIndex: index,
+    });
+    openEditModal();
   };
 
   onKeyPressHandler = (event) => {
@@ -174,27 +160,18 @@ class Diary extends Component {
   };
 
   render() {
-    const { lessons } = this.state;
+    const { lessons, editIndex, sortStatus } = this.state;
     const {
-      isOpen, isEdit, editIndex, sortStatus,
-    } = this.state;
-    localStorage.setItem('lessons', JSON.stringify(lessons));
-    lessons.forEach((item, index) => {
-      const averageMark = item.marks.length
-        ? item.marks
-          .map((note) => note.mark)
-          .reduce((accumulator, current) => +accumulator + +current, 0)
-          / item.marks.length
-        : 0;
-      lessons[index].averageMark = averageMark.toFixed(2);
-    });
+      isOpen, isEdit, openModal, closeModal,
+    } = this.props;
 
-    const lessonsRow = lessons.map((lesson, key) => (
+    const lessonsRow = this.sortArray().map((lesson, key) => (
       <Row
         name={lesson.name}
         teacher={lesson.teacher}
         marks={lesson.marks}
         averageMark={lesson.averageMark}
+        key={Date.now() * Math.random()}
         index={key}
         onDel={() => this.deleteLesson(key)}
         editLesson={() => this.toggleEditModal(key)}
@@ -206,30 +183,86 @@ class Diary extends Component {
         lessons={lessons}
         toggleModal={this.toggleModal}
         addLesson={this.addLesson}
-        editLesson={() => this.editLesson(editIndex)}
-        closeModal={this.closeModal}
+        editLesson={
+          (valueLessonInput, valueTeacherInput) => {
+            this.editLesson(editIndex, valueLessonInput, valueTeacherInput);
+          }
+        }
+        closeModal={closeModal}
         onEnter={this.onKeyPressHandler}
         isEdit={isEdit}
-        index={editIndex}
+        index={editIndex || 0}
       />
     ) : null;
 
     let sortLessonsIcon;
-    if (sortStatus === 'lessonsSort') {
-      sortLessonsIcon = <FontAwesomeIcon id="icon" className="active" icon={faSortAlphaDown} onClick={() => this.changeSortStatus('subjectSort')} />;
-    } else if (sortStatus === 'lessonsSortReverse') {
-      sortLessonsIcon = <FontAwesomeIcon id="icon" className="active" icon={faSortAlphaDownAlt} onClick={() => this.changeSortStatus('subjectSort')} />;
-    } else {
-      sortLessonsIcon = <FontAwesomeIcon id="icon" icon={faSortAlphaDown} onClick={() => this.changeSortStatus('subjectSort')} />;
+    switch (sortStatus) {
+      case 'lessonsSort':
+        sortLessonsIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            className="active"
+            icon={faSortAlphaDown}
+            onClick={() => this.changeSortStatus('subjectSort')}
+          />
+        );
+        break;
+
+      case 'lessonsSortReverse':
+        sortLessonsIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            className="active"
+            icon={faSortAlphaDownAlt}
+            onClick={() => this.changeSortStatus('subjectSort')}
+          />
+        );
+        break;
+
+      default:
+        sortLessonsIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            icon={faSortAlphaDown}
+            onClick={() => this.changeSortStatus('subjectSort')}
+          />
+        );
+        break;
     }
 
     let sortMarksIcon;
-    if (sortStatus === 'marksSort') {
-      sortMarksIcon = <FontAwesomeIcon id="icon" className="active" icon={faSortAmountDown} onClick={() => this.changeSortStatus('marksSort')} />;
-    } else if (sortStatus === 'marksSortReverse') {
-      sortMarksIcon = <FontAwesomeIcon id="icon" className="active" icon={faSortAmountDownAlt} onClick={() => this.changeSortStatus('marksSort')} />;
-    } else {
-      sortMarksIcon = <FontAwesomeIcon id="icon" icon={faSortAmountDown} onClick={() => this.changeSortStatus('marksSort')} />;
+    switch (sortStatus) {
+      case 'marksSort':
+        sortMarksIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            className="active"
+            icon={faSortAmountDown}
+            onClick={() => this.changeSortStatus('marksSort')}
+          />
+        );
+        break;
+
+      case 'marksSortReverse':
+        sortMarksIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            className="active"
+            icon={faSortAmountDownAlt}
+            onClick={() => this.changeSortStatus('marksSort')}
+          />
+        );
+        break;
+
+      default:
+        sortMarksIcon = (
+          <FontAwesomeIcon
+            id="icon"
+            icon={faSortAmountDown}
+            onClick={() => this.changeSortStatus('marksSort')}
+          />
+        );
+        break;
     }
 
     return (
@@ -237,7 +270,7 @@ class Diary extends Component {
         <h1 className="header">Diary</h1>
         <button
           type="button"
-          onClick={this.toggleModal}
+          onClick={openModal}
           className="Add-row__btn"
         >
           +
@@ -261,5 +294,13 @@ class Diary extends Component {
     );
   }
 }
+
+Diary.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  openModal: PropTypes.func.isRequired,
+  openEditModal: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  isEdit: PropTypes.bool.isRequired,
+};
 
 export default Diary;
