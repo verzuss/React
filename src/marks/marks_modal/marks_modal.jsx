@@ -7,6 +7,8 @@ import './marks_modal.scss';
 class MarksModal extends React.PureComponent {
   constructor(props) {
     super(props);
+    this.dateInput = React.createRef();
+    this.markInput = React.createRef();
     this.state = {
       isInputValue: false,
     };
@@ -23,17 +25,18 @@ class MarksModal extends React.PureComponent {
 
   checkInput = () => {
     const {
-      addMark, editMark, isEdit, getDateInput,
+      addMark, editMark, isEdit,
     } = this.props;
-    const dateInputValue = getDateInput.current.value;
+    const dateInputValue = this.dateInput.current.value;
+    const markInputValue = this.markInput.current.value;
     if (dateInputValue > this.formattedDate() || dateInputValue < '2000-01-01') {
       this.setState({
         isInputValue: true,
       });
     } else if (isEdit) {
-      editMark();
+      editMark(dateInputValue, markInputValue);
     } else {
-      addMark();
+      addMark(dateInputValue, markInputValue);
     }
   }
 
@@ -44,8 +47,6 @@ class MarksModal extends React.PureComponent {
       indexLesson,
       isEdit,
       closeModal,
-      getDateInput,
-      getMarkInput,
     } = this.props;
     const { isInputValue } = this.state;
     const errorSpan = isInputValue ? <span className="marks-modal__err-text">Permissible value: 2000 - current date</span> : null;
@@ -68,13 +69,17 @@ class MarksModal extends React.PureComponent {
                 required
                 id="date"
                 type="date"
-                ref={getDateInput}
+                ref={this.dateInput}
               />
             </div>
             {errorSpan}
             <div>
               mark
-              <select ref={getMarkInput} className="marks-modal__mark">
+              <select
+                ref={this.markInput}
+                className="marks-modal__mark"
+                onKeyDown={this.onKeyPressHandler}
+              >
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
@@ -98,22 +103,24 @@ class MarksModal extends React.PureComponent {
             date
             <input
               defaultValue={markValue.date}
+              onKeyDown={this.onKeyPressHandler}
               min="2000-01-01"
               max={today}
               className="marks-modal__date"
               required
               id="date"
               type="date"
-              ref={getDateInput}
+              ref={this.dateInput}
             />
           </div>
           {errorSpan}
           <div>
             mark
             <select
-              ref={getMarkInput}
+              ref={this.markInput}
               className="marks-modal__mark"
               defaultValue={markValue.mark}
+              onKeyDown={this.onKeyPressHandler}
             >
               <option>1</option>
               <option>2</option>
@@ -139,8 +146,6 @@ MarksModal.propTypes = {
   indexLesson: PropTypes.string.isRequired,
   indexMark: PropTypes.number.isRequired,
   isEdit: PropTypes.bool.isRequired,
-  getMarkInput: PropTypes.instanceOf(Object).isRequired,
-  getDateInput: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default MarksModal;

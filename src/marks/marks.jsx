@@ -10,8 +10,6 @@ import './marks.scss';
 class Marks extends Component {
   constructor(props) {
     super(props);
-    this.dateInput = React.createRef();
-    this.markInput = React.createRef();
     if (localStorage.getItem('lessons')) {
       this.state = {
         lessons: JSON.parse(localStorage.getItem('lessons')),
@@ -25,14 +23,13 @@ class Marks extends Component {
     localStorage.setItem('lessons', JSON.stringify(lessons));
   }
 
-  addMark = () => {
-    const inputValueDate = this.dateInput.current.value;
-    if (inputValueDate.trim()) {
+  addMark = (date, mark) => {
+    if (date.trim()) {
       const { lessons } = this.state;
       const { match, closeModal } = this.props;
       const note = {};
-      note.date = inputValueDate;
-      note.mark = this.markInput.current.value;
+      note.date = date;
+      note.mark = mark;
       note.id = Date.now();
       lessons[match.params.index].marks.push(note);
       this.setState({
@@ -42,13 +39,12 @@ class Marks extends Component {
     }
   }
 
-  editMark = (editIndex) => {
-    const inputValueDate = this.dateInput.current.value;
-    if (inputValueDate.trim()) {
+  editMark = (editIndex, date, mark) => {
+    if (date.trim()) {
       const { lessons } = this.state;
       const { match, closeModal } = this.props;
-      lessons[match.params.index].marks[editIndex].date = inputValueDate;
-      lessons[match.params.index].marks[editIndex].mark = this.markInput.current.value;
+      lessons[match.params.index].marks[editIndex].date = date;
+      lessons[match.params.index].marks[editIndex].mark = mark;
       this.setState({
         lessons,
         editIndex: null,
@@ -105,15 +101,15 @@ class Marks extends Component {
     const marksModal = isOpen ? (
       <MarksModal
         lessons={lessons}
-        addMark={this.addMark}
-        editMark={() => this.editMark(editIndex)}
+        addMark={(date, mark) => this.addMark(date, mark)}
+        editMark={(date, mark) => this.editMark(editIndex, date, mark)}
         closeModal={closeModal}
         onEnter={this.onKeyPressHandler}
         isEdit={isEdit}
         indexMark={editIndex || 0}
         indexLesson={match.params.index}
-        getDateInput={this.dateInput}
-        getMarkInput={this.markInput}
+        dateInput={this.dateInput}
+        markInput={this.markInput}
       />
     )
       : null;
