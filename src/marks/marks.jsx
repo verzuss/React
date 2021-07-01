@@ -33,6 +33,7 @@ class Marks extends Component {
       const note = {};
       note.date = inputValueDate;
       note.mark = this.markInput.current.value;
+      note.id = Date.now();
       lessons[match.params.index].marks.push(note);
       this.setState({
         lessons,
@@ -97,7 +98,7 @@ class Marks extends Component {
         index={key}
         onDel={() => this.deleteMark(key)}
         editLesson={() => this.toggleEditModal(key)}
-        key={Date.now() * Math.random()}
+        key={item.id}
       />
     ));
 

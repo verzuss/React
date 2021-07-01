@@ -23,9 +23,9 @@ class MarksModal extends React.PureComponent {
 
   checkInput = () => {
     const {
-      addMark, editMark, isEdit,
+      addMark, editMark, isEdit, getDateInput,
     } = this.props;
-    const dateInputValue = document.querySelector('.marks-modal__date').value;
+    const dateInputValue = getDateInput.current.value;
     if (dateInputValue > this.formattedDate() || dateInputValue < '2000-01-01') {
       this.setState({
         isInputValue: true,

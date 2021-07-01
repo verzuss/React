@@ -23,22 +23,6 @@ class Diary extends Component {
     this.addLesson = this.addLesson.bind(this);
   }
 
-  componentDidMount() {
-    let { lessons } = this.state;
-    lessons = lessons.map((lesson) => ({
-      ...lesson,
-      averageMark: lesson.marks.length
-        ? (lesson.marks
-          .map((note) => note.mark)
-          .reduce((accumulator, current) => +accumulator + +current, 0)
-            / lesson.marks.length).toFixed(2)
-        : '0.00',
-    }));
-    this.setState({
-      lessons,
-    });
-  }
-
   componentDidUpdate() {
     const { lessons } = this.state;
     localStorage.setItem('lessons', JSON.stringify(lessons));
@@ -70,7 +54,17 @@ class Diary extends Component {
   }
 
   sortArray = () => {
-    const { lessons, sortStatus } = this.state;
+    const { sortStatus } = this.state;
+    let { lessons } = this.state;
+    lessons = lessons.map((lesson) => ({
+      ...lesson,
+      averageMark: lesson.marks.length
+        ? (lesson.marks
+          .map((note) => note.mark)
+          .reduce((accumulator, current) => +accumulator + +current, 0)
+            / lesson.marks.length).toFixed(2)
+        : '0.00',
+    }));
     switch (sortStatus) {
       case 'lessonsSort':
         return lessons.sort((a, b) => {
@@ -111,6 +105,7 @@ class Diary extends Component {
             teacher: inputValueTeacher,
             averageMark: '0.00',
             marks: [],
+            id: Date.now(),
           },
         ],
         sortStatus: null,
@@ -171,7 +166,7 @@ class Diary extends Component {
         teacher={lesson.teacher}
         marks={lesson.marks}
         averageMark={lesson.averageMark}
-        key={Date.now() * Math.random()}
+        key={lesson.id}
         index={key}
         onDel={() => this.deleteLesson(key)}
         editLesson={() => this.toggleEditModal(key)}
