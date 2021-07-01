@@ -25,7 +25,7 @@ class MarksModal extends React.PureComponent {
 
   checkInput = () => {
     const {
-      addMark, editMark, isEdit,
+      addMark, editMark, isEdit, indexMark,
     } = this.props;
     const dateInputValue = this.dateInput.current.value;
     const markInputValue = this.markInput.current.value;
@@ -34,7 +34,7 @@ class MarksModal extends React.PureComponent {
         isInputValue: true,
       });
     } else if (isEdit) {
-      editMark(dateInputValue, markInputValue);
+      editMark(indexMark, { date: dateInputValue, mark: markInputValue });
     } else {
       addMark(dateInputValue, markInputValue);
     }

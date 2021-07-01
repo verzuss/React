@@ -39,12 +39,12 @@ class Marks extends Component {
     }
   }
 
-  editMark = (editIndex, date, mark) => {
-    if (date.trim()) {
+  editMark = (editIndex, patch) => {
+    if (patch.date.trim()) {
       const { lessons } = this.state;
       const { match, closeModal } = this.props;
-      lessons[match.params.index].marks[editIndex].date = date;
-      lessons[match.params.index].marks[editIndex].mark = mark;
+      lessons[match.params.index].marks[editIndex].date = patch.date;
+      lessons[match.params.index].marks[editIndex].mark = patch.mark;
       this.setState({
         lessons,
         editIndex: null,
@@ -101,8 +101,8 @@ class Marks extends Component {
     const marksModal = isOpen ? (
       <MarksModal
         lessons={lessons}
-        addMark={(date, mark) => this.addMark(date, mark)}
-        editMark={(date, mark) => this.editMark(editIndex, date, mark)}
+        addMark={this.addMark}
+        editMark={this.editMark}
         closeModal={closeModal}
         onEnter={this.onKeyPressHandler}
         isEdit={isEdit}
